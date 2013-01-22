@@ -26,6 +26,7 @@
  * 		You will require the HTMLCleaner library which can be downloaded
  * 		from http://htmlcleaner.sourceforge.net/
  */
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URL;
@@ -39,6 +40,7 @@ import org.htmlcleaner.XPatherException;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+
 
 /**
  * @author Raveesh
@@ -79,7 +81,7 @@ public class WikiOnThisDay {
 				"November",
 				"December"
 		};
-		URL url = new URL("http://wikipedia.org/wiki/"+months[month-1]+"_"+date);
+		URL url = new URL("http://en.wikipedia.org/wiki/"+months[month-1]+"_"+date);
 		TagNode node;
 		HtmlCleaner cleaner = new HtmlCleaner();
         CleanerProperties props = cleaner.getProperties();
@@ -88,30 +90,38 @@ public class WikiOnThisDay {
         props.setRecognizeUnicodeChars(true);
         props.setOmitComments(true);
         URLConnection conn = url.openConnection();
-        node = cleaner.clean(new InputStreamReader(conn.getInputStream()));
-        Object[] info_nodes = node.evaluateXPath("body/div/div/div/ul");
+        conn.setRequestProperty("User-Agent", "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_7_0) AppleWebKit/537.17 (KHTML, like Gecko) Chrome/24.0.1312.52 Safari/537.17");
+        InputStreamReader is = new InputStreamReader(conn.getInputStream());
+        BufferedReader br = new BufferedReader(is);
+        node = cleaner.clean(is);
+        Object[] info_nodes = node.evaluateXPath("//div[@id='mw-content-text']");
         TagNode[] nodes = new TagNode[3];
+        TagNode root = (TagNode) info_nodes[0];
+        info_nodes = root.getElementsByName("ul", false);
         
-        TagNode EventsNode = (TagNode) info_nodes[0];
-    	List EventsChildren = EventsNode.getElementListByName("li", false);
+        int eventsNode = 0;
+        if (month == 1 && date == 1)
+        	eventsNode++;
+        TagNode EventsNode = (TagNode) info_nodes[eventsNode];
+        List EventsChildren = EventsNode.getElementListByName("li", false);
     	Events = new JSONArray();
         for (int i=0;i<EventsChildren.size();i++){
         	TagNode child = (TagNode) EventsChildren.get(i);
         	String text = child.getText().toString();
-        	String[] split = text.split(" ‚Äì ");
+        	String[] split = text.split(" – ");
         	JSONObject item = new JSONObject();
         	item.put("year", split[0]);
         	item.put("text", split[1]);
         	Events.put(item);
         }
         
-        TagNode BirthsNode = (TagNode) info_nodes[1];
+        TagNode BirthsNode = (TagNode) info_nodes[eventsNode+1];
     	List BirthsChildren = BirthsNode.getElementListByName("li", false);
     	Births = new JSONArray();
     	for (int i=0;i<BirthsChildren.size();i++){
         	TagNode child = (TagNode) BirthsChildren.get(i);
         	String text = child.getText().toString();
-        	String[] split = text.split(" ‚Äì ");
+        	String[] split = text.split(" – ");
         	JSONObject item = new JSONObject();
         	item.put("year", split[0]);
         	item.put("text", split[1]);
@@ -119,13 +129,13 @@ public class WikiOnThisDay {
         }
 
         
-    	TagNode DeathsNode = (TagNode) info_nodes[2];
+    	TagNode DeathsNode = (TagNode) info_nodes[eventsNode+2];
     	List DeathsChildren = DeathsNode.getElementListByName("li", false);
     	Deaths = new JSONArray();
         for (int i=0;i<DeathsChildren.size();i++){
         	TagNode child = (TagNode) DeathsChildren.get(i);
         	String text = child.getText().toString();
-        	String[] split = text.split(" ‚Äì ");
+        	String[] split = text.split(" – ");
         	JSONObject item = new JSONObject();
         	item.put("year", split[0]);
         	item.put("text", split[1]);
