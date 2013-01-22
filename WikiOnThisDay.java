@@ -105,10 +105,11 @@ public class WikiOnThisDay {
         for (int i=0;i<EventsChildren.size();i++){
         	TagNode child = (TagNode) EventsChildren.get(i);
         	String text = child.getText().toString();
-        	String[] split = text.split(" – ");
+        	String splitby = "–";
+        	String[] split = text.split(splitby);
         	JSONObject item = new JSONObject();
-        	item.put("year", split[0]);
-        	item.put("text", split[1]);
+        	item.put("year", split[0].trim());
+        	item.put("text", split[1].trim());
         	Events.put(item);
         }
         
@@ -118,10 +119,11 @@ public class WikiOnThisDay {
     	for (int i=0;i<BirthsChildren.size();i++){
         	TagNode child = (TagNode) BirthsChildren.get(i);
         	String text = child.getText().toString();
-        	String[] split = text.split(" – ");
+        	String splitby = "–";
+        	String[] split = text.split(splitby);
         	JSONObject item = new JSONObject();
-        	item.put("year", split[0]);
-        	item.put("text", split[1]);
+        	item.put("year", split[0].trim());
+        	item.put("text", split[1].trim());
         	Births.put(item);
         }
 
@@ -132,10 +134,11 @@ public class WikiOnThisDay {
         for (int i=0;i<DeathsChildren.size();i++){
         	TagNode child = (TagNode) DeathsChildren.get(i);
         	String text = child.getText().toString();
-        	String[] split = text.split(" – ");
+        	String splitby = "–";
+        	String[] split = text.split(splitby);
         	JSONObject item = new JSONObject();
-        	item.put("year", split[0]);
-        	item.put("text", split[1]);
+        	item.put("year", split[0].trim());
+        	item.put("text", split[1].trim());
         	Deaths.put(item);
         }
 
