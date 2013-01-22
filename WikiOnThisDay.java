@@ -81,7 +81,7 @@ public class WikiOnThisDay {
 				"November",
 				"December"
 		};
-		URL url = new URL("http://en.wikipedia.org/wiki/"+months[month-1]+"_"+date);
+		URL url = new URL("http://wikipedia.org/wiki/"+months[month-1]+"_"+date);
 		TagNode node;
 		HtmlCleaner cleaner = new HtmlCleaner();
         CleanerProperties props = cleaner.getProperties();
@@ -94,12 +94,9 @@ public class WikiOnThisDay {
         InputStreamReader is = new InputStreamReader(conn.getInputStream());
         BufferedReader br = new BufferedReader(is);
         node = cleaner.clean(is);
-        Object[] info_nodes = node.evaluateXPath("//div[@id='mw-content-text']");
-        TagNode[] nodes = new TagNode[3];
-        TagNode root = (TagNode) info_nodes[0];
-        info_nodes = root.getElementsByName("ul", false);
+        Object[] info_nodes = node.evaluateXPath("//ul");
         
-        int eventsNode = 0;
+        int eventsNode = 1;
         if (month == 1 && date == 1)
         	eventsNode++;
         TagNode EventsNode = (TagNode) info_nodes[eventsNode];
